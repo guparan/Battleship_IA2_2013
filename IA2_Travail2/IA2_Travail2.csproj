@@ -50,5 +50,12 @@
     <Compile Include="RandomOpponent.cs" />
     <Compile Include="Ship.cs" />
     <Compile Include="ShipOrientation.cs" />
+    <Compile Include="Defense.cs" />
+    <Compile Include="Dreadnought.cs" />
+    <Compile Include="GameState.cs" />
+    <Compile Include="IDefense.cs" />
+    <Compile Include="IOffense.cs" />
+    <Compile Include="Offense.cs" />
+    <Compile Include="SeaState.cs" />
   </ItemGroup>
 </Project>
