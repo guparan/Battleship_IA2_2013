@@ -8,14 +8,14 @@
     {
         static void Main(string[] args)
         {
-            var op1 = new RandomOpponent();
+            var op1 = new Dreadnought();
             var op2 = new RandomOpponent();
 
             BattleshipCompetition bc = new BattleshipCompetition(
                 op1,
                 op2,
                 new TimeSpan(0, 0, 1),  // Time per game
-                51,                     // Wins per match
+                1,                     // Wins per match
                 true,                   // Play out?
                 new Size(10, 10),       // Board Size
                 2, 3, 3, 4, 5           // Ship Sizes
