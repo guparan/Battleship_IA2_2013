@@ -141,11 +141,11 @@ namespace Battleship {
     public void print() {
       for (int y = 0; y < boardSize.Height; y++) {
         for (int x = 0; x < boardSize.Width; x++) {
-          char c = ' ';
-          if (state[x,y] == SeaState.CLEAR) c = '.';
-          if (state[x,y] == SeaState.MISS) c = '!';
-          if (state[x,y] == SeaState.HIT) c = 'H';
-          if (state[x,y] == SeaState.SUNK) c = 'S';
+          string c = "";
+          if (state[x,y] == SeaState.CLEAR) c = "..O..";
+          if (state[x,y] == SeaState.MISS) c = "..Z..";
+          if (state[x,y] == SeaState.HIT) c = "..H..";
+          if (state[x,y] == SeaState.SUNK) c = "..X..";
           Console.Write("{0}", c);
         }
         Console.WriteLine();
