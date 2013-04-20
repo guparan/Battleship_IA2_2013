@@ -195,7 +195,7 @@ namespace Battleship {
       Console.WriteLine("possible unsunk hits");
       for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-          Console.Write("{0}", possible_unsunk_hits[x,y] ? 'H' : '.');
+          Console.Write("{0}", possible_unsunk_hits[x,y] ? "..H.." : "..O..");
         }
         Console.WriteLine();
       }
