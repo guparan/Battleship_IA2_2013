@@ -1,123 +1,134 @@
-namespace Battleship
-{
-  	using System;
+namespace Battleship {
+	using System;
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Drawing;
 
-	public class Dreadnought : IBattleshipOpponent
-	{
+	public class Dreadnought : IBattleshipOpponent {
     
-		public string Name {
+		public string Name
+		{
 			get {
 				String s = "Dreadnought";
 				foreach (String opt in options) {
-					s += "," + opt;
+				  s += "," + opt;
 				}
 				return s;
 			}
 		}
-		public Version Version { get { return new Version (1, 2); } }
-    
-		Size gameSize;
-		IOffense offense;
-		IDefense defense;
-		public List<String> options = new List<String> ();
 
-		public void setOption (String option)
+		public Version Version { get { return new Version(1, 2); } }
+
+		Size gameSize;			// Dimensions de la grille de jeu
+		IOffense offense;		// Gestion de l'attaque
+		IDefense defense;		// Gestion de la défense : placement intelligent des bâteaux
+		public List<String> options = new List<String>();	// Liste d'options : pas utilisé
+
+		public void setOption(String option)
 		{
-			options.Add (option);
-		}
-    
-		public void NewMatch (string opponent)
-		{
+			options.Add(option);
 		}
 
-		public void NewGame (Size size, TimeSpan timeSpan)
+		public void NewMatch(string opponent) { }
+
+		public void NewGame(Size size, TimeSpan timeSpan)
 		{
-			if (size != gameSize) {
-				offense = new Offense (size, options);
-				defense = new Defense (size, options);
+			// Si le nouveau jeu a des dimensions différentes on redéfinit offense, defense et gameSize
+			if (size != gameSize)
+			{
+				offense = new Offense(size, options);
+				defense = new Defense(size, options);
 				gameSize = size;
 			}
 		}
-    
-		public void PlaceShips (ReadOnlyCollection<Ship> ships)
+
+		public void PlaceShips(ReadOnlyCollection<Ship> ships)
 		{
+			// Tableau contenant les tailles de bâteaux à placer
 			int[] ship_sizes = new int[ships.Count];
-			for (int i = 0; i < ships.Count; i++)
-				ship_sizes [i] = ships [i].Length;
-			offense.startGame (ship_sizes);
-			List<Ship> placement = defense.startGame (ship_sizes);
-      
-			// copy placement over to collection we're returning
-			foreach (Ship s in placement) {
-				foreach (Ship t in ships) {
-					if (!t.IsPlaced && t.Length == s.Length) {
-						t.Place (s.Location, s.Orientation);
-						break;
+			for (int i = 0; i < ships.Count; i++) ship_sizes[i] = ships[i].Length;
+			
+			// Envoi de ce paramètre à l'attaque et à la défense
+			offense.startGame(ship_sizes);
+			List<Ship> placement = defense.startGame(ship_sizes); // Génère un placement intelligent
+
+			// Enregistrement du placement généré par la défense
+			foreach (Ship s in placement)	// Pour tous les bâteaux s du placement généré...
+			{
+				foreach (Ship t in ships)	// Pour tous les bâteaux t de la collection 'ships'...
+				{
+					if (!t.IsPlaced && t.Length == s.Length)	// Si t n'est pas placé et que sa longueur égale celle de s 
+					{
+						t.Place(s.Location, s.Orientation);		// On affecte le placement au bâteau t
+						break;									// On passe au placement suivant
 					}
 				}
 			}
 		}
-    
-		public Point GetShot ()
+
+		// Retourne un point de tir choisi intelligemment par le module d'attaque.
+		public Point GetShot()
 		{
-			Point p = offense.getShot ();
-#if DEBUG
-			Console.WriteLine ("shoot at {0},{1}", p.X, p.Y);
-#endif
+			Point p = offense.getShot();
+		#if DEBUG
+			Console.WriteLine("shoot at {0},{1}", p.X, p.Y);
+		#endif
 			return p;
 		}
-    
-		public void OpponentShot (Point shot)
+
+		// Enregistre un tir ennemi. Pris en charge par le module de défense.
+		public void OpponentShot(Point shot)
 		{
-#if DEBUG
-			Console.WriteLine ("opponent shot {0},{1}", shot.X, shot.Y);
-#endif
-			defense.shot (shot);
+		#if DEBUG
+		  	Console.WriteLine("opponent shot {0},{1}", shot.X, shot.Y);
+		#endif
+		  	defense.shot(shot);
 		}
-    
-		public void ShotHit (Point shot, bool sunk)
+
+		// Enregistre un tir réussi (touché ou coulé) : module d'attaque.
+		public void ShotHit(Point shot, bool sunk)
 		{
-#if DEBUG
-			Console.WriteLine ("shot at {0},{1} hit{2}", shot.X, shot.Y, sunk ? " and sunk" : "");
-#endif
-			if (sunk)
-				offense.shotSunk (shot);
-			else
-				offense.shotHit (shot);
+		#if DEBUG
+		  	Console.WriteLine("shot at {0},{1} hit{2}", shot.X, shot.Y, sunk ?  " and sunk" : "");
+		#endif
+		  	if (sunk) offense.shotSunk(shot);	// Si le tir a coulé un bâteau, utilisation de shotSunk
+		  	else offense.shotHit(shot);			// Sinon utilisation de shotHit
 		}
-    
-		public void ShotMiss (Point shot)
+
+		// Enregistre un tir manqué : module d'attaque.
+		public void ShotMiss(Point shot)
 		{
-#if DEBUG
-			Console.WriteLine ("shot at {0},{1} missed", shot.X, shot.Y);
-#endif
-			offense.shotMiss (shot);
+		#if DEBUG
+		  	Console.WriteLine("shot at {0},{1} missed", shot.X, shot.Y);
+		#endif
+		  	offense.shotMiss(shot);
 		}
-    
-		public void GameWon ()
+
+		// Indique que le joueur a gagné la partie
+		public void GameWon()
 		{
-#if DEBUG
-			Console.WriteLine ("game won");
-#endif
-			offense.endGame ();
-			defense.endGame ();
+		#if DEBUG
+		  	Console.WriteLine("game won");
+		#endif
+			MatchOver();
 		}
-    
-		public void GameLost ()
+
+		// Indique que le joueur a perdu la partie
+		public void GameLost()
 		{
-#if DEBUG
-			Console.WriteLine ("game lost");
-#endif
-			offense.endGame ();
-			defense.endGame ();
+		#if DEBUG
+		  	Console.WriteLine("game lost");
+		#endif
+			MatchOver();
 		}
-    
-		public void MatchOver ()
+
+		// Termine la partie
+		public void MatchOver()
 		{
+			offense.endGame();
+			defense.endGame();
 		}
-	}
-}
+  
+	}	// fin class Dreadnought
+}		// fin namespace Battleship
