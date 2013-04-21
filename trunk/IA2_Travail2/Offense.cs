@@ -11,10 +11,13 @@ namespace Battleship
 
 	public class Offense : IOffense
 	{
+		/*********** ATTRIBUTES ***********/
+
 		private int w;
 		private int h;
 		private Random rand = new Random ();
 		public GameState state;
+
 		private int apriori_types = 2;
 		private int apriori_type;
 		private int total_ships_size;
@@ -27,6 +30,11 @@ namespace Battleship
 		int shots_in_game;
 		int[,] statistics_shot_hit;
 		int[,] statistics_shot_miss;
+
+		private static Size[] dirs = {new Size (1, 0), new Size (-1, 0), new Size (0, 1), new Size (0, -1)};
+
+
+		/*********** METHODS ***********/
 
 		public Offense (Size size, List<String> options)
 		{
@@ -43,6 +51,7 @@ namespace Battleship
 			assume_notouching = options.Exists (x => x == "assume_notouching");
 		}
 
+		// Debut du jeu : init des attributs
 		public void startGame (int[] ships_sizes)
 		{
 			state = new GameState (w, h, ships_sizes);
@@ -52,26 +61,31 @@ namespace Battleship
 			shots_in_game = 0;
 		}
 
+		// Un tir a retourné "manqué"
 		public void shotMiss (Point shot)
 		{
-			state.addMiss (shot);
-			statistics_shot_miss [shot.X, shot.Y]++;
+			state.addMiss (shot); // On marque cette position comme manquée
+			statistics_shot_miss [shot.X, shot.Y]++; // Utilisé pour calculer la fréquence des tirs touchés en un point
 		}
 
+		// Un tir a retourné "touché"
 		public void shotHit (Point shot)
 		{
-			state.addHit (shot); 
-			statistics_shot_hit [shot.X, shot.Y]++;
+			state.addHit (shot); // On marque cette position comme touchée
+			statistics_shot_hit [shot.X, shot.Y]++;  // Utilisé pour calculer la fréquence des tirs touchés en un point
 		}
 
+		// Un tir a retourné "coulé"
 		public void shotSunk (Point shot)
 		{
-			state.addSunk (shot);
-			if (assume_notouching) {
-				foreach (Point p in getSquares()) {
+			state.addSunk (shot); // On marque cette position comme coulée
+			// Si les bateaux ne se touchent pas, on marque tous les points 
+			// autour d'un touché ou d'un coulé comme manqués (on économise des coups)
+			if (assume_notouching) { 
+				foreach (Point p in getAllPoints()) {
 					if (state.get (p) == SeaState.HIT || state.get (p) == SeaState.SUNK) {
 						foreach (Point q in neighbors(p)) {
-							if (state.get (q) == SeaState.CLEAR) {
+							if (state.get (q) == SeaState.CLEAR) { // on ne regarde que les points clear (non tirés)
 								state.addMiss (q);
 								break;
 							}
@@ -82,9 +96,12 @@ namespace Battleship
 			statistics_shot_hit [shot.X, shot.Y]++;
 		}
 
+		// A la fin du jeu : log des frequences
 		public void endGame ()
 		{
 #if DEBUG
+			// L'history probability en un point est la fréquence de tirs touchés (sur toutes les parties)
+			// Plus cette valeur est élevée, plus souvent la position est occupée par un bateau adverse
 			Console.WriteLine ("history probability");
 			for (int y = 0; y < h; y++) {
 				Console.Write ("   ");
@@ -97,36 +114,39 @@ namespace Battleship
 #endif
 		}
 
+		// Choix du prochain coup
 		public Point getShot ()
 		{
 #if DEBUG
 			Console.WriteLine ("getting shot {0}", shots_in_game++);
 			state.print ();
 #endif
-			List<Point> choices = getShot_ExtendShips ();
+			// Recuperation de la liste des coups interessants
+			List<Point> choices = getShot_ExtendShips (); 
 
-			if (choices.Count == 0) {
-				Point r = getShot_Random ();
+			if (choices.Count == 0) { // Si aucun coup interessant n'a été trouvé
+				Point r = getShot_Random (); // Choix d'un coup au hasard
 #if DEBUG
-				foreach (Point q in neighbors(r)) {
+				foreach (Point q in neighbors(r)) { // On regarde si ce coup est à coté d'un point déjà touché (ou coulé)
 					if (state.get (q) == SeaState.HIT || state.get (q) == SeaState.SUNK)
 						Console.WriteLine ("adjacent to ship!");
 				}
 #endif
 				return r;
 			}
-
+			// cas "normal" : il y a des coups interessants
 #if DEBUG
 			Console.Write ("extendships ");
 			foreach (Point p in choices)
-				Console.Write ("{0} ", p);
+				Console.Write ("{0} ", p); // on affiche ces coups
 			Console.WriteLine ();
 #endif
+			// On choisit le coup joué au hasard parmis les coups interessants
 			return choices [rand.Next (choices.Count)];
 		}
 
 		// returns all squares on the board.
-		private IEnumerable<Point> getSquares ()
+		private IEnumerable<Point> getAllPoints ()
 		{
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
@@ -135,10 +155,7 @@ namespace Battleship
 			}
 		}
 
-		private static Size[] dirs = {new Size (1, 0), new Size (-1, 0),
-   new Size (0, 1), new Size (0, -1)};
-
-		// returns the <= 4 neighbor squares of the given point
+		// returns the <= 4 neighbor points of the given point
 		//  0
 		// 1*2
 		//  3
@@ -152,6 +169,7 @@ namespace Battleship
 		}
 
 		// public for testing
+		// Fonction qui détermine quels coups sont intéressants
 		public List<Point> getShot_ExtendShips ()
 		{
 			List<Point> choices = new List<Point> ();
@@ -189,7 +207,7 @@ namespace Battleship
 
 			// return maximum weight squares
 			double maxw = 0.0;
-			foreach (Point p in getSquares()) {
+			foreach (Point p in getAllPoints()) {
 				if (weight [p.X, p.Y] > maxw) {
 					maxw = weight [p.X, p.Y];
 					choices.Clear ();
@@ -201,6 +219,7 @@ namespace Battleship
 			return choices;
 		}
 
+		// Fonction qui choisit un coup au hasard
 		private Point getShot_Random ()
 		{
 
@@ -315,16 +334,18 @@ namespace Battleship
 			return max_points [rand.Next (max_points.Count)];
 		}
 
+		// ???
 		double apriori_prob (int len, Point p, ShipOrientation orient)
 		{
-			if (apriori_type == 0) {
-				// uniform distribution
+			switch (apriori_type) {
+			case 0:
+					// uniform distribution
 				if (orient == ShipOrientation.Horizontal)
 					return 1.0 / (w - len + 1) / h;
 				else
 					return 1.0 / (h - len + 1) / w;
-			} else if (apriori_type == 1) {
-				// weighted towards edge
+			case 1:
+					// weighted towards edge
 				double scale = Math.Sqrt (2.0) - 1; // factor of 2.0 from center to edge
 				if (orient == ShipOrientation.Horizontal) {
 					int min = 0;
@@ -349,7 +370,7 @@ namespace Battleship
 					r *= 1.0 + scale * Math.Abs (p.Y - mid) / (max - mid);
 					return r;
 				}
-			} else {
+			default:
 				return 0.0;
 			}
 		}
@@ -386,12 +407,14 @@ namespace Battleship
 
 			// # of samples to weight prior (17/100) and current data 50/50.
 			double fake_shots = 25;
-			double fake_hits = fake_shots * total_ships_size / (w * h);
+			double total_possible_hits = total_ships_size / (w * h);
+			double fake_hits = fake_shots * total_possible_hits;
 
 			double res = (hits + fake_hits) / (shots + fake_shots);
 			return res;
 		}
 
+		// Fonction qui affiche la probabilité que ??? pour tous les points
 		void print_apriori ()
 		{
 			for (apriori_type = 0; apriori_type < apriori_types; apriori_type++) {
@@ -404,12 +427,16 @@ namespace Battleship
 							Console.Write ("   ");
 							for (int x = 0; x < w; x++) {
 								double p;
+								// si (a partir de ce point un bateau horizontal sort de la grille) 
+								// ou (a partir de ce point un bateau vertical sort de la grille)
 								if ((orient == 0 && x + size > w) || (orient == 1 && y + size > h)) {
 									p = 0.0;
 								} else {
+									// On calcule la probabilité que ???
 									p = apriori_prob (size, new Point (x, y), (ShipOrientation)orient);
 								}
-								Console.Write (" {0,-4}", (int)(10000 * p));
+								// Affichage des probabilités à la 6e décimale près
+								Console.Write (String.Format (" {0:0.######}", p));
 								sum += p;
 							}
 							Console.WriteLine ();
