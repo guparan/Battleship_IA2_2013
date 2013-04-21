@@ -18,6 +18,7 @@
             this.gameSize = size;
         }
 
+		// Placement aléatoire des bâteaux dans la grille de jeu
         public void PlaceShips(ReadOnlyCollection<Ship> ships)
         {
             foreach (Ship s in ships)
@@ -30,6 +31,7 @@
             }
         }
 
+		// Choix aléatoire de tir dans la grille adverse
         public Point GetShot()
         {
             return new Point(
@@ -37,6 +39,7 @@
                 rand.Next(this.gameSize.Height));
         }
 
+		// Méthode inutilisées
         public void NewMatch(string opponent) { }
         public void OpponentShot(Point shot) { }
         public void ShotHit(Point shot, bool sunk) { }
