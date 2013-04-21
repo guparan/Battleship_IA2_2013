@@ -14,9 +14,9 @@
 
 			// Instanciation de la compétition
 			BattleshipCompetition bc = new BattleshipCompetition (
-                op1,
-                op2,
-                new TimeSpan (0, 0, 1),  // Temps limite par jeu
+                op1,					 // Joueur 1
+                op2,					 // Joueur 2
+                new TimeSpan (0, 0, 1),  // Durée maximale d'une partie
                 1,                       // Nombre de parties gagnantes nécessaires
                 true,                    // Jouer tous les matchs ?
                 new Size (10, 10),       // Taille de la grille
