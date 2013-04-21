@@ -16,20 +16,20 @@ namespace Battleship
 		private int w;
 		private int h;
 		private Random rand = new Random ();
-		public GameState state;
+		public GameState state; // Etat de la grille, conserve les tirs effectues : CLEAR (pas tiré), MISS (rien), HIT(touché), SUNK(coulé)
 
 		private int apriori_types = 2;
-		private int apriori_type;
-		private int total_ships_size;
+		private int apriori_type; // ???
+		private int total_ships_size; // Nombre de points occupés par les bateaux
 
 		// option flags
-		public bool fully_resolve_hits;
-		public bool assume_notouching;
+		public bool fully_resolve_hits; // ???
+		public bool assume_notouching; // Les bateaux ne se touchent pas
 
 		// statistics kept about opponent's layout behavior
-		int shots_in_game;
-		int[,] statistics_shot_hit;
-		int[,] statistics_shot_miss;
+		int shots_in_game; // Nombre de tirs effectués (sur une seule partie)
+		int[,] statistics_shot_hit; // Nombre de tirs "touché" en ce point (sur toutes les parties)
+		int[,] statistics_shot_miss; // Nombre de tirs "manqué" en ce point (sur toutes les parties)
 
 		private static Size[] dirs = {new Size (1, 0), new Size (-1, 0), new Size (0, 1), new Size (0, -1)};
 
@@ -174,19 +174,20 @@ namespace Battleship
 		{
 			List<Point> choices = new List<Point> ();
 
+			// ???
 			if (!fully_resolve_hits) {
 				foreach (List<Ship> list in state.ship_possibilities) {
 					if (state.allSunk (list))
-						return choices;
+						return choices; // retourne liste vide : on va choisir le coup au hasard
 				}
 			}
 
 			// algorithm: choose spot which, if a miss, maximizes the
 			// number of ship layout possibilities (weighted by probability)
 			// which we eliminate.
-			double[,] weight = new double[w, h];
+			double[,] weight = new double[w, h]; // Grille de poids : plus un coup est interessant, plus sont poids sera élevé
 			foreach (List<Ship> list in state.ship_possibilities) {
-				double wt = state.probability (list);
+				double wt = state.probability (list); // On récupère la probabilité que ???
 				foreach (Ship s in list) {
 					foreach (Point p in s.GetAllLocations()) {
 						if (state.get (p) == SeaState.CLEAR) {
@@ -199,7 +200,8 @@ namespace Battleship
 			Console.WriteLine ("weights:");
 			for (int y = 0; y < h; y++) {
 				for (int x = 0; x < w; x++) {
-					Console.Write ("{0,-4} ", (int)(1000 * weight [x, y]));
+					// Ecriture des poids à la 6e décimale près
+					Console.Write (String.Format (" {0:0.00000}", weight [x, y]));
 				}
 				Console.WriteLine ();
 			}
@@ -248,9 +250,9 @@ namespace Battleship
 
 			// find out which squares could hold the remaining ships, and if so
 			// what the probability of each square is.
-			double[,] ship_prob = new double[w, h];
+			double[,] ship_prob = new double[w, h]; // probabilité qu'il y ait un bateau en chaque point
 			foreach (int len in state.remaining_ship_sizes()) {
-				double[,] aposteriori_prob = new double[w, h];
+				double[,] aposteriori_prob = new double[w, h]; // ???
 				for (int x = 0; x < w; x++) {
 					for (int y = 0; y < h; y++) {
 						for (int orient = 0; orient < 2; orient++) {
@@ -270,7 +272,8 @@ namespace Battleship
 								}
 							}
 							if (!good)
-								continue;
+								continue; // On passe à l'autre orientation
+
 							double p = apriori_prob (len, new Point (x, y), (ShipOrientation)orient);
 							bool next_to_other_ship = false;
 							for (int i = 0; i < len; i++) {
@@ -306,6 +309,7 @@ namespace Battleship
 				}
 			}
 
+			// On retient la proba maximale
 			double max_prob = 0;
 			foreach (double p in ship_prob)
 				if (p > max_prob)
@@ -321,7 +325,7 @@ namespace Battleship
 			}
 #endif
 
-			// pick random one of the prob maximizing spots
+			// On récupère tous les points à proba maximale
 			List<Point> max_points = new List<Point> ();
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
@@ -331,6 +335,7 @@ namespace Battleship
 				}
 			}
 
+			// pick random one of the prob maximizing spots
 			return max_points [rand.Next (max_points.Count)];
 		}
 
