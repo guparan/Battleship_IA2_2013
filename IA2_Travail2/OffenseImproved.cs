@@ -182,8 +182,6 @@ namespace Battleship
 				}
 			}
 
-			double maxw = 0.0;
-
 			// algorithm: choose spot which, if a miss, maximizes the
 			// number of ship layout possibilities (weighted by probability)
 			// which we eliminate.
@@ -210,24 +208,20 @@ namespace Battleship
 #endif
 
 			// return maximum weight squares
-//			double maxw = 0.0;
+			double maxw = 0.0;
 
 			foreach (Point p in getAllPoints()) {
 				if (weight [p.X, p.Y] > maxw) {
 					maxw = weight [p.X, p.Y];
-//					choices.Clear ();
 				}
-//				if (weight [p.X, p.Y] == maxw) {
-//					choices.Add (p);
-//				}
 			}
 
 			int seen_x = 0;
 			int seen_y = 0;
 
-			int x_search = rand.Next (0, w);
+			int x_search = rand.Next (0, w);  // Départ aléatoire pour x
 			while (seen_x < w) {
-				int y_search = rand.Next (0, h);
+				int y_search = rand.Next (0, h);  // Départ aléatoire pour y
 				while (seen_y < h) {
 					if (weight [x_search, y_search] == maxw) {
 						choices.Add (new Point (x_search, y_search));
