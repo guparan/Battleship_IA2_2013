@@ -1,5 +1,5 @@
 // Module de la bataille navale Dreadnought qui prend en charge la défense.
-// Placement intelligent des bâteaux sur la grille de jeu pour éviter les
+// Placement intelligent des bateaux sur la grille de jeu pour éviter les
 // tirs ennemis.
 
 namespace Battleship
@@ -18,9 +18,9 @@ namespace Battleship
 		int w, h;					// Dimensions de la grille de jeu (width et height)
 		Random rand = new Random ();
 
-		// Option utilisées pour le choix d'un placement de bâteaux parmis plusieurs
-		bool place_notouching = false;   // si vrai, les placements avec des bâteaux adjacents sont fortemant pénalisés.
-		bool standard_touching = false;  // si vrai, le contact entre les bâteaux est ignoré. Sinon, faible pénalité en cas de contact.
+		// Option utilisées pour le choix d'un placement de bateaux parmis plusieurs
+		bool place_notouching = false;   // si vrai, les placements avec des bateaux adjacents sont fortemant pénalisés.
+		bool standard_touching = false;  // si vrai, le contact entre les bateaux est ignoré. Sinon, faible pénalité en cas de contact.
 		// Info : otherwise, we thin out touching to about 1/4 of generated boards.
 
 		/* Statistiques retenues sur le comportement de l'adversaire */
@@ -41,7 +41,7 @@ namespace Battleship
 		// Départ du jeu : choix d'un placement pour les bateaux de tailles données dans la liste en paramètre
 		public List<Ship> startGame (int[] ship_sizes)
 		{
-			List<Ship> placement = placeShips (ship_sizes); // Placement des bâteaux de tailles données en paramètre
+			List<Ship> placement = placeShips (ship_sizes); // Placement des bateaux de tailles données en paramètre
 			print_placement (placement);			// Affichage du placement choisi
 			nshots_in_game = 0;					// Initialisation du nombre de coups tirés
 			return placement;
@@ -64,7 +64,7 @@ namespace Battleship
 		}
 
 
-		// Renvoie une liste de bâteaux placés intelligemment dans la grille
+		// Renvoie une liste de bateaux placés intelligemment dans la grille
 		private List<Ship> placeShips (int[] ship_sizes)
 		{
 			int max_opp_shots = 0;	// Plus grand nombre de coups tirés par l'adversaire sur un même point
@@ -83,14 +83,14 @@ namespace Battleship
 			}
 			#endif
 		  
-			// Génération aléatoire de 100 placements : liste de 100 listes de bâteaux
+			// Génération aléatoire de 100 placements : liste de 100 listes de bateaux
 			const int N = 100;
 			List<List<Ship>> allocations = new List<List<Ship>> ();
 
 			for (int n = 0; n < N; n++) {
-				List<Ship> allocation = new List<Ship> ();	// Nouvelle liste de bâteaux
-				foreach (int size in ship_sizes) {	// Pour toutes les tailles de bâteaux demandées...
-					Ship s = new Ship (size);	// Nouveau bâteau de taille 'size'
+				List<Ship> allocation = new List<Ship> ();	// Nouvelle liste de bateaux
+				foreach (int size in ship_sizes) {	// Pour toutes les tailles de bateaux demandées...
+					Ship s = new Ship (size);	// Nouveau bateau de taille 'size'
 					while (true) {
 						// Position et orientation aléatoires
 						int x = rand.Next (w);
@@ -102,7 +102,7 @@ namespace Battleship
 						if (!s.IsValid (new Size (w, h)))
 							continue;
 
-						// S'il n'y a pas de conflits entre les bâteaux on sort de la boucle while
+						// S'il n'y a pas de conflits entre les bateaux on sort de la boucle while
 						bool ok = true;
 						foreach (Ship t in allocation) {
 							if (s.ConflictsWith (t)) {
@@ -113,7 +113,7 @@ namespace Battleship
 						if (ok)
 							break;
 					}
-					allocation.Add (s);			// Ajout du bâteau à la liste
+					allocation.Add (s);			// Ajout du bateau à la liste
 				}
 				allocations.Add (allocation);	// Ajout de la liste à allocations
 			}
@@ -127,12 +127,13 @@ namespace Battleship
 
 			foreach (List<Ship> allocation in allocations) {	// Pour chaque placement proposé...
 				int score = 0;						// Initialisation du score à 0
-				foreach (Ship s in allocation) {		// Pour chaque bâteau s...
-					foreach (Point p in s.GetAllLocations()) {	// Pour chaque point appartenant au bâteau...
+				foreach (Ship s in allocation)		// Pour chaque bateau s...
+				{
+					foreach (Point p in s.GetAllLocations()) {	// Pour chaque point appartenant au bateau...
 						// Incrémentation du score en fonction du nombre de tirs adverse sur ce point
 						score += 100 * opponent_shots [p.X, p.Y] / max_opp_shots;
 					}
-					foreach (Ship t in allocation) {	// Pour chaque bâteau t...
+					foreach (Ship t in allocation) {	// Pour chaque bateau t...
 						// Si s et t son adjacents et que l'option standard_touching est désactivée : faible pénalité
 						if (!standard_touching && shipsAdjacent (s, t))
 							score += 20;
@@ -152,12 +153,12 @@ namespace Battleship
 		}
 
 
-		// Retourne vrai si les bâteaux en paramètre sont adjacents
+		// Retourne vrai si les bateaux en paramètre sont adjacents
 		private bool shipsAdjacent (Ship s, Ship t)
 		{
-			foreach (Point p in s.GetAllLocations())	// Pour tout point appartenant au bâteau s...
+			foreach (Point p in s.GetAllLocations())	// Pour tout point appartenant au bateau s...
 			{
-				// On regarde si les points 4-voisins sont sur le bâteau t
+				// On regarde si les points 4-voisins sont sur le bateau t
 				if (t.IsAt (p + new Size (1, 0)))
 					return true;
 				if (t.IsAt (p + new Size (-1, 0)))
@@ -171,7 +172,7 @@ namespace Battleship
 		}
 
 
-		// Affichage du placement des bâteaux de la liste en paramètre
+		// Affichage du placement des bateaux de la liste en paramètre
 		private void print_placement (List<Ship> ships)
 		{
 			int adj = 0;	// Nombre d'adjacence
@@ -194,7 +195,7 @@ namespace Battleship
 				}
 			}
 
-			// Représentation des bâteaux : les '.' sont remplacés par des nombres indiquant la longueur des bâteaux
+			// Représentation des bateaux : les '.' sont remplacés par des nombres indiquant la longueur des bateaux
 			foreach (Ship s in ships) {
 				foreach (Point p in s.GetAllLocations()) {
 					placement [p.X, p.Y] = (char)('0' + s.Length);
