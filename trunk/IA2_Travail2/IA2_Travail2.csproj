@@ -57,5 +57,11 @@
     <Compile Include="IOffense.cs" />
     <Compile Include="Offense.cs" />
     <Compile Include="SeaState.cs" />
+    <Compile Include="DefenseImproved.cs" />
+    <Compile Include="DreadnoughtImproved.cs" />
+    <Compile Include="OffenseImproved.cs" />
+    <Compile Include="DefenseBasic.cs" />
+    <Compile Include="DreadnoughtBasic.cs" />
+    <Compile Include="OffenseBasic.cs" />
   </ItemGroup>
 </Project>

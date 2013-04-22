@@ -9,34 +9,34 @@ namespace Battleship
 	using System.Collections.ObjectModel;
 	using System.Drawing;
 
-	public class Offense : IOffense
+	public class OffenseBasic : IOffense
 	{
 		/*********** ATTRIBUTES ***********/
 
-		protected int w;
-		protected int h;
-		protected Random rand = new Random ();
+		private int w;
+		private int h;
+		private Random rand = new Random ();
 		public GameState state; // Etat de la grille, conserve les tirs effectues : CLEAR (pas tiré), MISS (rien), HIT(touché), SUNK(coulé)
 
-		protected int apriori_types = 2;
-		protected int apriori_type; // ???
-		protected int total_ships_size; // Nombre de points occupés par les bateaux
+		private int apriori_types = 2;
+		private int apriori_type; // ???
+		private int total_ships_size; // Nombre de points occupés par les bateaux
 
 		// option flags
 		public bool fully_resolve_hits; // ???
 		public bool assume_notouching; // Les bateaux ne se touchent pas
 
 		// statistics kept about opponent's layout behavior
-		protected int shots_in_game; // Nombre de tirs effectués (sur une seule partie)
-		protected int[,] statistics_shot_hit; // Nombre de tirs "touché" en ce point (sur toutes les parties)
-		protected int[,] statistics_shot_miss; // Nombre de tirs "manqué" en ce point (sur toutes les parties)
+		int shots_in_game; // Nombre de tirs effectués (sur une seule partie)
+		int[,] statistics_shot_hit; // Nombre de tirs "touché" en ce point (sur toutes les parties)
+		int[,] statistics_shot_miss; // Nombre de tirs "manqué" en ce point (sur toutes les parties)
 
-		protected static Size[] dirs = {new Size (1, 0), new Size (-1, 0), new Size (0, 1), new Size (0, -1)};
+		private static Size[] dirs = {new Size (1, 0), new Size (-1, 0), new Size (0, 1), new Size (0, -1)};
 
 
 		/*********** METHODS ***********/
 
-		public Offense (Size size, List<String> options)
+		public OffenseBasic (Size size, List<String> options)
 		{
 			w = size.Width;
 			h = size.Height;
@@ -142,7 +142,8 @@ namespace Battleship
 			Console.WriteLine ();
 #endif
 			// On choisit le coup joué au hasard parmis les coups interessants
-			return choices [rand.Next (choices.Count)];
+//			return choices [rand.Next (choices.Count)];
+			return choices [0];
 		}
 
 		// returns all squares on the board.
@@ -208,6 +209,18 @@ namespace Battleship
 #endif
 
 			// return maximum weight squares
+//			double maxw = 0.0;
+//			Point maxp = new Point ();
+//
+//			foreach (Point p in getAllPoints()) {
+//				if (weight [p.X, p.Y] > maxw) {
+//					maxw = weight [p.X, p.Y];
+//					maxp.X = p.X;
+//					maxp.Y = p.Y;
+//				}
+//			}
+//
+//			choices.Add (maxp);
 			double maxw = 0.0;
 			foreach (Point p in getAllPoints()) {
 				if (weight [p.X, p.Y] > maxw) {
@@ -218,12 +231,18 @@ namespace Battleship
 					choices.Add (p);
 				}
 			}
+
+#if DEBUG
+			Console.WriteLine ("Chosen weight: {0}");
+#endif
+
 			return choices;
 		}
 
 		// Fonction qui choisit un coup au hasard
 		private Point getShot_Random ()
 		{
+//			Console.WriteLine ("Hasard");
 			// find out which hits are definitely sunk and which might still be
 			// on live ships.
 			bool[,] possible_unsunk_hits = new bool[w, h];
@@ -324,18 +343,23 @@ namespace Battleship
 			}
 #endif
 
-			// On récupère tous les points à proba maximale
-			List<Point> max_points = new List<Point> ();
+//			 On récupère tous les points à proba maximale
+			if (max_prob == 0)
+				return new Point (rand.Next (w), rand.Next (h));
+
+//			List<Point> max_points = new List<Point> ();
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					if (ship_prob [x, y] == max_prob) {
-						max_points.Add (new Point (x, y));
+						return new Point (x, y);
+//						max_points.Add (new Point (x, y));
 					}
 				}
 			}
-
 			// pick random one of the prob maximizing spots
-			return max_points [rand.Next (max_points.Count)];
+//			return max_points [rand.Next (max_points.Count)];
+
+			throw new Exception ("Aucun max trouvé");
 		}
 
 		// ???

@@ -9,34 +9,34 @@ namespace Battleship
 	using System.Collections.ObjectModel;
 	using System.Drawing;
 
-	public class Offense : IOffense
+	public class OffenseImproved : IOffense
 	{
 		/*********** ATTRIBUTES ***********/
 
-		protected int w;
-		protected int h;
-		protected Random rand = new Random ();
+		private int w;
+		private int h;
+		private Random rand = new Random ();
 		public GameState state; // Etat de la grille, conserve les tirs effectues : CLEAR (pas tiré), MISS (rien), HIT(touché), SUNK(coulé)
 
-		protected int apriori_types = 2;
-		protected int apriori_type; // ???
-		protected int total_ships_size; // Nombre de points occupés par les bateaux
+		private int apriori_types = 2;
+		private int apriori_type; // ???
+		private int total_ships_size; // Nombre de points occupés par les bateaux
 
 		// option flags
 		public bool fully_resolve_hits; // ???
 		public bool assume_notouching; // Les bateaux ne se touchent pas
 
 		// statistics kept about opponent's layout behavior
-		protected int shots_in_game; // Nombre de tirs effectués (sur une seule partie)
-		protected int[,] statistics_shot_hit; // Nombre de tirs "touché" en ce point (sur toutes les parties)
-		protected int[,] statistics_shot_miss; // Nombre de tirs "manqué" en ce point (sur toutes les parties)
+		int shots_in_game; // Nombre de tirs effectués (sur une seule partie)
+		int[,] statistics_shot_hit; // Nombre de tirs "touché" en ce point (sur toutes les parties)
+		int[,] statistics_shot_miss; // Nombre de tirs "manqué" en ce point (sur toutes les parties)
 
-		protected static Size[] dirs = {new Size (1, 0), new Size (-1, 0), new Size (0, 1), new Size (0, -1)};
+		private static Size[] dirs = {new Size (1, 0), new Size (-1, 0), new Size (0, 1), new Size (0, -1)};
 
 
 		/*********** METHODS ***********/
 
-		public Offense (Size size, List<String> options)
+		public OffenseImproved (Size size, List<String> options)
 		{
 			w = size.Width;
 			h = size.Height;
@@ -182,6 +182,8 @@ namespace Battleship
 				}
 			}
 
+			double maxw = 0.0;
+
 			// algorithm: choose spot which, if a miss, maximizes the
 			// number of ship layout possibilities (weighted by probability)
 			// which we eliminate.
@@ -208,22 +210,48 @@ namespace Battleship
 #endif
 
 			// return maximum weight squares
-			double maxw = 0.0;
+//			double maxw = 0.0;
+
 			foreach (Point p in getAllPoints()) {
 				if (weight [p.X, p.Y] > maxw) {
 					maxw = weight [p.X, p.Y];
-					choices.Clear ();
+//					choices.Clear ();
 				}
-				if (weight [p.X, p.Y] == maxw) {
-					choices.Add (p);
-				}
+//				if (weight [p.X, p.Y] == maxw) {
+//					choices.Add (p);
+//				}
 			}
+
+			int seen_x = 0;
+			int seen_y = 0;
+
+			int x_search = rand.Next (0, w);
+			while (seen_x < w) {
+				int y_search = rand.Next (0, h);
+				while (seen_y < h) {
+					if (weight [x_search, y_search] == maxw) {
+						choices.Add (new Point (x_search, y_search));
+						return choices;
+					}
+					y_search = (y_search + 1) % h;
+					seen_y++;
+				}
+				x_search = (x_search + 1) % w;
+				seen_y = 0;
+				seen_x ++;
+			}
+
+#if DEBUG
+			Console.WriteLine ("Chosen weight: {0}");
+#endif
+
 			return choices;
 		}
 
 		// Fonction qui choisit un coup au hasard
 		private Point getShot_Random ()
 		{
+//			Console.WriteLine ("Hasard");
 			// find out which hits are definitely sunk and which might still be
 			// on live ships.
 			bool[,] possible_unsunk_hits = new bool[w, h];
@@ -325,17 +353,38 @@ namespace Battleship
 #endif
 
 			// On récupère tous les points à proba maximale
-			List<Point> max_points = new List<Point> ();
-			for (int x = 0; x < w; x++) {
-				for (int y = 0; y < h; y++) {
-					if (ship_prob [x, y] == max_prob) {
-						max_points.Add (new Point (x, y));
-					}
-				}
-			}
-
+//			List<Point> max_points = new List<Point> ();
+//			for (int x = 0; x < w; x++) {
+//				for (int y = 0; y < h; y++) {
+//					if (ship_prob [x, y] == max_prob) {
+//						max_points.Add (new Point (x, y));
+//					}
+//				}
+//			}
+			
 			// pick random one of the prob maximizing spots
-			return max_points [rand.Next (max_points.Count)];
+//			return max_points [rand.Next (max_points.Count)];
+
+			int seen_x = 0;
+			int seen_y = 0;
+
+			int x_search = rand.Next (0, w);
+			while (seen_x < w) {
+				int y_search = rand.Next (0, h);
+				while (seen_y < h) {
+//					Console.WriteLine ("{0}", new Point (x_search, y_search));
+					if (ship_prob [x_search, y_search] == max_prob) {
+						return new Point (x_search, y_search);
+					}
+//					Console.WriteLine ("OK");
+					y_search = (y_search + 1) % h;
+					seen_y++;
+				}
+				x_search = (x_search + 1) % w;
+				seen_y = 0;
+				seen_x ++;
+			}
+			throw new Exception ("Aucun max trouvé");
 		}
 
 		// ???
