@@ -7,10 +7,10 @@
 
     public sealed class Ship
     {
-        private bool isPlaced = false;
-        private Point location;
-        private ShipOrientation orientation;
-        private int length;
+        private bool isPlaced = false;			// Indique si le bateau est placé dans la grille
+        private Point location;					// Point où est situé le bateau
+        private ShipOrientation orientation;	// Orientation du bateau : horizontal ou vertical
+        private int length;						// Longueur du bateau (cas général : 2, 3, 4 ou 5)
 
         public Ship(int length)
         {

@@ -22,7 +22,7 @@ namespace Battleship {
 
 		Size gameSize;			// Dimensions de la grille de jeu
 		IOffense offense;		// Gestion de l'attaque
-		IDefense defense;		// Gestion de la défense : placement intelligent des bâteaux
+		IDefense defense;		// Gestion de la défense : placement intelligent des bateaux
 		public List<String> options = new List<String>();	// Liste d'options : pas utilisé
 
 		public void setOption(String option)
@@ -45,7 +45,7 @@ namespace Battleship {
 
 		public void PlaceShips(ReadOnlyCollection<Ship> ships)
 		{
-			// Tableau contenant les tailles de bâteaux à placer
+			// Tableau contenant les tailles de bateaux à placer
 			int[] ship_sizes = new int[ships.Count];
 			for (int i = 0; i < ships.Count; i++) ship_sizes[i] = ships[i].Length;
 			
@@ -54,13 +54,13 @@ namespace Battleship {
 			List<Ship> placement = defense.startGame(ship_sizes); // Génère un placement intelligent
 
 			// Enregistrement du placement généré par la défense
-			foreach (Ship s in placement)	// Pour tous les bâteaux s du placement généré...
+			foreach (Ship s in placement)	// Pour tous les bateaux s du placement généré...
 			{
-				foreach (Ship t in ships)	// Pour tous les bâteaux t de la collection 'ships'...
+				foreach (Ship t in ships)	// Pour tous les bateaux t de la collection 'ships'...
 				{
 					if (!t.IsPlaced && t.Length == s.Length)	// Si t n'est pas placé et que sa longueur égale celle de s 
 					{
-						t.Place(s.Location, s.Orientation);		// On affecte le placement au bâteau t
+						t.Place(s.Location, s.Orientation);		// On affecte le placement au bateau t
 						break;									// On passe au placement suivant
 					}
 				}
@@ -92,7 +92,7 @@ namespace Battleship {
 		#if DEBUG
 		  	Console.WriteLine("shot at {0},{1} hit{2}", shot.X, shot.Y, sunk ?  " and sunk" : "");
 		#endif
-		  	if (sunk) offense.shotSunk(shot);	// Si le tir a coulé un bâteau, utilisation de shotSunk
+		  	if (sunk) offense.shotSunk(shot);	// Si le tir a coulé un bateau, utilisation de shotSunk
 		  	else offense.shotHit(shot);			// Sinon utilisation de shotHit
 		}
 

@@ -20,7 +20,7 @@
                 1,                       // Nombre de parties gagnantes nécessaires
                 true,                    // Jouer tous les matchs ?
                 new Size (10, 10),       // Taille de la grille
-                2, 3, 3, 4, 5            // Liste des tailles des bâteaux
+                2, 3, 3, 4, 5            // Liste des tailles des bateaux
 			);
 
 			// Lancement de la compétition

@@ -18,7 +18,7 @@
             this.gameSize = size;
         }
 
-		// Placement aléatoire des bâteaux dans la grille de jeu
+		// Placement aléatoire des bateaux dans la grille de jeu
         public void PlaceShips(ReadOnlyCollection<Ship> ships)
         {
             foreach (Ship s in ships)

@@ -14,7 +14,7 @@
 		private int wins;					// Nombre de parties gagnantes nécessaires
 		private bool playOut;				// Jouer tous les matchs ?
 		private Size boardSize;				// Taille de la grille
-		private List<int> shipSizes;		// Liste des tailles des bâteaux
+		private List<int> shipSizes;		// Liste des tailles des bateaux
 
 		// Constructeur
 		public BattleshipCompetition (IBattleshipOpponent op1, IBattleshipOpponent op2, TimeSpan timePerGame, int wins, bool playOut, Size boardSize, params int[] shipSizes)
@@ -71,7 +71,7 @@
 			var opponents = new Dictionary<int, IBattleshipOpponent> ();	// Joueurs
 			var scores = new Dictionary<int, int> ();						// Scores des joueurs : Nb de parties gagnées
 			var times = new Dictionary<int, Stopwatch> ();					// Temps pris par chaque joueur sur une partie
-			var ships = new Dictionary<int, List<Ship>> ();					// Bâteaux des joueurs
+			var ships = new Dictionary<int, List<Ship>> ();					// bateaux des joueurs
 			var shots = new Dictionary<int, List<Point>> ();				// Mémoire des coups tirés par les joueurs
 
 			var first = 0;		// Le joueur 1 est celui d'indice 0 dans opponents
@@ -141,15 +141,15 @@
 					continue;
 				}
 
-				// Placement des bâteaux pour le 1er joueur
+				// Placement des bateaux pour le 1er joueur
 				success = false;
 				do {
-					// Création de la liste des bâteaux du premier joueur à partir des tailles "shipSizes"
+					// Création de la liste des bateaux du premier joueur à partir des tailles "shipSizes"
 					ships [first] = (from s in this.shipSizes
                                     select new Ship (s)).ToList ();
 
 					times [first].Start ();
-					// Placement des bâteaux avec la méthode propre au joueur
+					// Placement des bateaux avec la méthode propre au joueur
 					opponents [first].PlaceShips (ships [first].AsReadOnly ());
 					times [first].Stop ();
 					if (times [first].Elapsed > this.timePerGame) {
@@ -196,7 +196,7 @@
 					continue;
 				}
 
-				// Placement des bâteaux pour le 2ème joueur : même méthode
+				// Placement des bateaux pour le 2ème joueur : même méthode
 				success = false;
 				do {
 					ships [second] = (from s in this.shipSizes
@@ -274,17 +274,17 @@
 						break;
 					}
 
-					// Variable indiquant s'il y a un bâteau au point de tir sur la grille adverse
+					// Variable indiquant s'il y a un bateau au point de tir sur la grille adverse
 					var ship = (from s in ships [1 - current]
                                 where s.IsAt (shot)
                                 select s).SingleOrDefault ();
 
-					// S'il y a un bâteau...
+					// S'il y a un bateau...
 					if (ship != null) {
-						var sunk = ship.IsSunk (shots [current]); // Indique si le bâteau est coulé
+						var sunk = ship.IsSunk (shots [current]); // Indique si le bateau est coulé
 
 						times [current].Start ();
-						opponents [current].ShotHit (shot, sunk);	// Notifie le joueur qu'il a touché un bâteau en ce point
+						opponents [current].ShotHit (shot, sunk);	// Notifie le joueur qu'il a touché un bateau en ce point
 						times [current].Stop ();
 						if (times [current].Elapsed > this.timePerGame) {
 							RecordWin (1 - current, current, scores, opponents);
@@ -292,7 +292,7 @@
 						}
 					}
 
-					// Si pas de bâteau
+					// Si pas de bateau
 					else {
 						times [current].Start ();
 						opponents [current].ShotMiss (shot);	// Notifie le joueur que son tir est manqué
@@ -303,12 +303,12 @@
 						}
 					}
 
-					// Indique s'il reste des bâteaux non coulés
+					// Indique s'il reste des bateaux non coulés
 					var unsunk = (from s in ships [1 - current]
                                   where !s.IsSunk (shots [current])
                                   select s);
 
-					// Si tous les bâteaux sont coulés, le joueur courant a gagné, fin de la partie
+					// Si tous les bateaux sont coulés, le joueur courant a gagné, fin de la partie
 					if (!unsunk.Any ()) {
 						RecordWin (current, 1 - current, scores, opponents);
 						break;
