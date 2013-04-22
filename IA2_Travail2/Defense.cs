@@ -52,10 +52,10 @@ namespace Battleship
 		{
 			// Incrémentation de opponent_shots à la coordonnées du tir
 			// S'il y a eu moins de 50 coups dans la partie, on accorde plus d'importance au tir
-			// (l'adverse est susceptible de jouer plus souvent sur ce point)
+			// (l'adversaire est susceptible de jouer plus souvent sur ce point)
 			opponent_shots [p.X, p.Y] += Math.Max (1, 50 - nshots_in_game);
 		  
-			// Incrémentation du nombre de coups tirés dans la partie
+			// Incrémentation du nombre total de coups tirés dans la partie
 			nshots_in_game++;
 		}
 
@@ -130,20 +130,20 @@ namespace Battleship
 				foreach (Ship s in allocation)		// Pour chaque bateau s...
 				{
 					foreach (Point p in s.GetAllLocations()) {	// Pour chaque point appartenant au bateau...
-						// Incrémentation du score en fonction du nombre de tirs adverse sur ce point
+						// Incrémentation du score en fonction du nombre de tirs adverses sur ce point
 						score += 100 * opponent_shots [p.X, p.Y] / max_opp_shots;
 					}
 					foreach (Ship t in allocation) {	// Pour chaque bateau t...
-						// Si s et t son adjacents et que l'option standard_touching est désactivée : faible pénalité
+						// Si s et t sont adjacents et que l'option standard_touching est désactivée : faible pénalité
 						if (!standard_touching && shipsAdjacent (s, t))
 							score += 20;
-						// Si s et t son adjacents et que l'option place_notouching est activée : forte pénalité
+						// Si s et t sont adjacents et que l'option place_notouching est activée : forte pénalité
 						if (place_notouching && shipsAdjacent (s, t))
 							score += 1000000;
 					}
 				}
 				score += rand.Next(15);		// Ajout d'une faible valeur aléatoire pour éviter les doublons
-				if (score < minscore)		// Si le score obtenu est meilleure que minscore, on le prend comme référence.
+				if (score < minscore)		// Si le score obtenu est meilleur que minscore, on le prend comme référence.
 				{
 					minscore = score;				// Nouveau score min de référence.
 					min_allocation = allocation;	// Nouveau placement optimal
