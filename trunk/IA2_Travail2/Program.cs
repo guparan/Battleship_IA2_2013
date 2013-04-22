@@ -17,8 +17,8 @@
                 op1,					 // Joueur 1
                 op2,					 // Joueur 2
                 new TimeSpan (0, 0, 1),  // Durée maximale d'une partie
-                100,                       // Nombre de parties gagnantes nécessaires
-                true,                    // Jouer tous les matchs ?
+                500,                       // Nombre de parties gagnantes nécessaires
+                false,                    // Jouer tous les matchs ?
                 new Size (10, 10),       // Taille de la grille
                 2, 3, 3, 4, 5            // Liste des tailles des bateaux
 			);

@@ -209,33 +209,18 @@ namespace Battleship
 #endif
 
 			// return maximum weight squares
-//			double maxw = 0.0;
-//			Point maxp = new Point ();
-//
-//			foreach (Point p in getAllPoints()) {
-//				if (weight [p.X, p.Y] > maxw) {
-//					maxw = weight [p.X, p.Y];
-//					maxp.X = p.X;
-//					maxp.Y = p.Y;
-//				}
-//			}
-//
-//			choices.Add (maxp);
-			double maxw = 0.0;
+			double maxw = -1.0;
+			Point maxp = new Point ();
+
 			foreach (Point p in getAllPoints()) {
 				if (weight [p.X, p.Y] > maxw) {
 					maxw = weight [p.X, p.Y];
-					choices.Clear ();
-				}
-				if (weight [p.X, p.Y] == maxw) {
-					choices.Add (p);
+					maxp.X = p.X;
+					maxp.Y = p.Y;
 				}
 			}
 
-#if DEBUG
-			Console.WriteLine ("Chosen weight: {0}");
-#endif
-
+			choices.Add (maxp);
 			return choices;
 		}
 
